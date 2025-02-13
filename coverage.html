@@ -1,0 +1,1091 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>api: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">vuln-scanner/api/query.go (0.0%)</option>
+				
+				<option value="file1">vuln-scanner/api/route.go (0.0%)</option>
+				
+				<option value="file2">vuln-scanner/api/scan.go (0.0%)</option>
+				
+				<option value="file3">vuln-scanner/database/database.go (75.0%)</option>
+				
+				<option value="file4">vuln-scanner/fetchfiles.go (0.0%)</option>
+				
+				<option value="file5">vuln-scanner/main.go (0.0%)</option>
+				
+				<option value="file6">vuln-scanner/services/query.go (79.2%)</option>
+				
+				<option value="file7">vuln-scanner/services/scan.go (16.8%)</option>
+				
+				<option value="file8">vuln-scanner/test.go (0.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package api
+
+import (
+        // "vuln-scanner/api"
+
+        "encoding/json"
+        "net/http"
+        "vuln-scanner/services"
+
+        _ "github.com/mattn/go-sqlite3"
+)
+
+func QueryHandler(w http.ResponseWriter, r *http.Request) <span class="cov0" title="0">{
+        var req struct {
+                Filters map[string]string `json:"filters"`
+        }
+
+        if err := json.NewDecoder(r.Body).Decode(&amp;req); err != nil </span><span class="cov0" title="0">{
+                http.Error(w, "Invalid request payload", http.StatusBadRequest)
+                return
+        }</span>
+
+        <span class="cov0" title="0">severity, ok := req.Filters["severity"]
+        if !ok </span><span class="cov0" title="0">{
+                http.Error(w, "Missing severity filter", http.StatusBadRequest)
+                return
+        }</span>
+        <span class="cov0" title="0">results, err := services.QueryVulnerabilities(severity)
+        if err != nil </span><span class="cov0" title="0">{
+                http.Error(w, "Database query error", http.StatusInternalServerError)
+                return
+        }</span>
+
+        // rows, err := db.Query("SELECT id, severity, cvss, status, package_name, current_version, fixed_version, description, published_date, link, risk_factors, source_file, scan_time, scan_id, resource_type, resource_name FROM vulnerabilities WHERE severity = ?", severity)
+        // if err != nil {
+        //         http.Error(w, "Database query error", http.StatusInternalServerError)
+        //         return
+        // }
+        // defer rows.Close()
+        // //fmt.Println(rows)
+        // var results []map[string]interface{}
+        // for rows.Next() {
+        //         var (
+        //                 id, severity, status, packageName, currentVersion, fixedVersion, description, publishedDate, link, riskFactors, sourceFile, scanTime, scanId, resourceType, resourceName sql.NullString
+        //                 cvss                                                                                                                                                                     sql.NullFloat64
+        //         )
+        //         if err := rows.Scan(&amp;id, &amp;severity, &amp;cvss, &amp;status, &amp;packageName, &amp;currentVersion, &amp;fixedVersion, &amp;description, &amp;publishedDate, &amp;link, &amp;riskFactors, &amp;sourceFile, &amp;scanTime, &amp;scanId, &amp;resourceType, &amp;resourceName); err != nil {
+        //                 fmt.Print(err)
+        //                 http.Error(w, "Error scanning database results", http.StatusInternalServerError)
+        //                 return
+        //         }
+        //         result := map[string]interface{}{
+        //                 "id":              nullStringToString(id),
+        //                 "severity":        nullStringToString(severity),
+        //                 "cvss":            nullFloatToFloat(cvss),
+        //                 "status":          nullStringToString(status),
+        //                 "package_name":    nullStringToString(packageName),
+        //                 "current_version": nullStringToString(currentVersion),
+        //                 "fixed_version":   nullStringToString(fixedVersion),
+        //                 "description":     nullStringToString(description),
+        //                 "published_date":  nullStringToString(publishedDate),
+        //                 "link":            nullStringToString(link),
+        //                 "risk_factors":    parseRiskFactors(nullStringToString(riskFactors)),
+        //                 "source_file":     nullStringToString(sourceFile),
+        //                 "scan_time":       nullStringToString(scanTime),
+        //                 "scan_id":         nullStringToString(scanId),
+        //                 "resource_type":   nullStringToString(resourceType),
+        //                 "resource_name":   nullStringToString(resourceName),
+        //         }
+        //         results = append(results, result)
+        // }
+
+        <span class="cov0" title="0">w.Header().Set("Content-Type", "application/json")
+        json.NewEncoder(w).Encode(results)</span>
+}
+
+// func nullStringToString(ns sql.NullString) string {
+//         if ns.Valid {
+//                 return ns.String
+//         }
+//         return "" // Return empty string for null values
+// }
+
+// func nullFloatToFloat(nf sql.NullFloat64) interface{} {
+//         if nf.Valid {
+//                 return nf.Float64
+//         }
+//         return nil // Return nil for null floats
+// }
+
+// func parseRiskFactors(riskFactors string) []string {
+//         var parsed []string
+//         err := json.Unmarshal([]byte(riskFactors), &amp;parsed)
+//         if err != nil {
+//                 // If it's a plain string with spaces, convert it to a slice
+//                 return []string{riskFactors}
+//         }
+//         return parsed
+// }
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package api
+
+import (
+        "github.com/gorilla/mux"
+)
+
+func SetupRoutes() *mux.Router <span class="cov0" title="0">{
+        r := mux.NewRouter()
+        r.HandleFunc("/scan", ScanHandler).Methods("POST")
+        r.HandleFunc("/query", QueryHandler).Methods("POST")
+        return r
+}</span>
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package api
+
+import (
+        "encoding/json"
+        "net/http"
+        "strings"
+        "vuln-scanner/services"
+)
+
+type ScanRequest struct {
+        Repo  string   `json:"repo"`
+        Files []string `json:"files"`
+}
+
+func ScanHandler(w http.ResponseWriter, r *http.Request) <span class="cov0" title="0">{
+        var req ScanRequest
+
+        if err := json.NewDecoder(r.Body).Decode(&amp;req); err != nil </span><span class="cov0" title="0">{
+                http.Error(w, "Invalid request payload", http.StatusBadRequest)
+                return
+        }</span>
+
+        <span class="cov0" title="0">if req.Repo == "" || len(req.Files) == 0 </span><span class="cov0" title="0">{
+                http.Error(w, "Missing repo or files", http.StatusBadRequest)
+                return
+        }</span>
+        <span class="cov0" title="0">parts := strings.SplitN(req.Repo, "/", 2)
+        if len(parts) != 2 </span><span class="cov0" title="0">{
+                http.Error(w, "Invalid repo format. Expected 'owner/repository'", http.StatusBadRequest)
+                return
+        }</span>
+        <span class="cov0" title="0">repoOwner, repoName := parts[0], parts[1]
+        totalVulnCount := services.MainScanner(repoOwner, repoName)
+        w.Header().Set("Content-Type", "application/json")
+        w.WriteHeader(http.StatusOK)
+        response := map[string]interface{}{
+                "message":               "Scan completed successfully",
+                "repo":                  req.Repo,
+                "files":                 req.Files,
+                "total_vulnerabilities": totalVulnCount,
+        }
+        json.NewEncoder(w).Encode(response)</span>
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package database
+
+import (
+        "database/sql"
+
+        _ "github.com/mattn/go-sqlite3"
+)
+
+var DB *sql.DB
+
+func InitDB() (*sql.DB, error) <span class="cov8" title="1">{
+        var err error
+        DB, err = sql.Open("sqlite3", "./vulnerabilities.db")
+        if err != nil </span><span class="cov0" title="0">{
+                panic(err)</span>
+        }
+
+        <span class="cov8" title="1">_, err = DB.Exec(`CREATE TABLE IF NOT EXISTS vulnerabilities (
+                id TEXT PRIMARY KEY,
+                severity TEXT,
+                cvss REAL,
+                status TEXT,
+                package_name TEXT,
+                current_version TEXT,
+                fixed_version TEXT,
+                description TEXT,
+                published_date TEXT,
+                link TEXT,
+                risk_factors TEXT,
+                source_file TEXT,
+                scan_time TEXT, 
+                scan_id TEXT, 
+                resource_type TEXT, 
+                resource_name TEXT
+        )`)
+
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">return DB, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package main
+
+import (
+        "encoding/json"
+        "fmt"
+        "io"
+        "net/http"
+        "time"
+)
+
+// const repoOwner = "velancio"
+// const repoName = "vulnerability_scans"
+
+// func main() {
+//         files, err := getRepoFiles(repoOwner, repoName)
+//         if err != nil {
+//                 fmt.Println("Error fetching repository files:", err)
+//                 return
+//         }
+//         totalVulnCount := 0
+//         for _, file := range files {
+//                 if file["type"] == "file" {
+//                         fileName := file["name"].(string)
+//                         if len(fileName) &gt; 5 &amp;&amp; fileName[len(fileName)-5:] == ".json" { // Check for .json extension
+//                                 fmt.Println("\nFetching:", fileName)
+//                                 countVul := fetchAndPrintJSON(repoOwner, repoName, fileName)
+//                                 totalVulnCount += countVul
+//                         }
+//                 }
+//         }
+//         fmt.Println("\nTotal vulnerabilities across all JSON files:", totalVulnCount)
+// }
+
+func getRepoFiles(owner, repo string) ([]map[string]interface{}, error) <span class="cov0" title="0">{
+        url := fmt.Sprintf("https://api.github.com/repos/%s/%s/contents", owner, repo)
+        resp, err := http.Get(url)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">defer resp.Body.Close()
+
+        if resp.StatusCode != 200 </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to fetch files, status code: %d", resp.StatusCode)
+        }</span>
+
+        <span class="cov0" title="0">body, err := io.ReadAll(resp.Body)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">var files []map[string]interface{}
+        err = json.Unmarshal(body, &amp;files)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">return files, nil</span>
+}
+func fetchAndStoreJSON(owner, repo, fileName string) int <span class="cov0" title="0">{
+        vulcount := 0
+        url := fmt.Sprintf("https://raw.githubusercontent.com/%s/%s/main/%s", owner, repo, fileName)
+        for attempt := 0; attempt &lt; 2; attempt++ </span><span class="cov0" title="0">{
+                fmt.Println("Attempt :", attempt, "fetching :", fileName)
+                resp, err := http.Get(url)
+                if err != nil </span><span class="cov0" title="0">{
+                        fmt.Println("Error fetching JSON (Attempt", attempt+1, "):", err)
+                        time.Sleep(2 * time.Second)
+                        continue</span>
+                }
+                <span class="cov0" title="0">defer resp.Body.Close()
+
+                if resp.StatusCode != 200 </span><span class="cov0" title="0">{
+                        fmt.Println("Failed to fetch JSON file:", fileName, "Status:", resp.StatusCode)
+                        time.Sleep(2 * time.Second)
+                        continue</span>
+                }
+
+                <span class="cov0" title="0">body, err := io.ReadAll(resp.Body)
+                if err != nil </span><span class="cov0" title="0">{
+                        fmt.Println("Error reading response body:", err)
+                        return 0
+                }</span>
+
+                <span class="cov0" title="0">var jsonData []interface{}
+                if err := json.Unmarshal(body, &amp;jsonData); err != nil </span><span class="cov0" title="0">{
+                        fmt.Println("Error parsing JSON:", err)
+                        return 0
+                }</span>
+
+                <span class="cov0" title="0">for _, item := range jsonData </span><span class="cov0" title="0">{
+                        obj, ok := item.(map[string]interface{})
+                        if !ok </span><span class="cov0" title="0">{
+                                fmt.Println("Error: Element is not a JSON object")
+                                continue</span>
+                        }
+
+                        <span class="cov0" title="0">scanResults, exists := obj["scanResults"].(map[string]interface{})
+                        if exists </span>{<span class="cov0" title="0">
+                                //fmt.Println(scanResults)
+                        }</span> else<span class="cov0" title="0"> {
+                                fmt.Println("Key 'scanResults' not found")
+                        }</span>
+
+                        <span class="cov0" title="0">scanID, _ := scanResults["scan_id"].(string)
+                        resourceType, _ := scanResults["resource_type"].(string)
+                        resourceName, _ := scanResults["resource_name"].(string)
+                        timestamp, _ := scanResults["timestamp"].(string)
+
+                        for _, key := range []string{"vulnerabilities", "findings"} </span><span class="cov0" title="0">{
+                                if vulResults, found := scanResults[key]; found </span><span class="cov0" title="0">{
+                                        vulArray, ok := vulResults.([]interface{})
+                                        if !ok </span><span class="cov0" title="0">{
+                                                fmt.Println("Error: ", key, " is not an array, actual type:", fmt.Sprintf("%T", vulResults))
+                                                continue</span>
+                                        }
+
+                                        <span class="cov0" title="0">for _, vulnItem := range vulArray </span><span class="cov0" title="0">{
+                                                vulnObj, ok := vulnItem.(map[string]interface{})
+                                                if !ok </span><span class="cov0" title="0">{
+                                                        fmt.Println("Error: vulnerability item is not a JSON object")
+                                                        continue</span>
+                                                }
+
+                                                <span class="cov0" title="0">_, err := db.Exec(`INSERT OR IGNORE INTO vulnerabilities (
+                                                        id, severity, cvss, status, package_name, current_version, fixed_version,
+                                                        description, published_date, link, risk_factors, source_file, scan_time, scan_id, resource_type, resource_name)
+                                                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                                                        vulnObj["id"], vulnObj["severity"], vulnObj["cvss"], vulnObj["status"],
+                                                        vulnObj["package_name"], vulnObj["current_version"], vulnObj["fixed_version"],
+                                                        vulnObj["description"], vulnObj["published_date"], vulnObj["link"],
+                                                        marshalRiskFactors(vulnObj["risk_factors"]), fileName, timestamp, scanID, resourceType, resourceName)
+                                                if err != nil </span><span class="cov0" title="0">{
+                                                        fmt.Println("DB Insert Error:", err)
+                                                }</span>
+                                                <span class="cov0" title="0">fmt.Println("-----")</span>
+                                        }
+                                        <span class="cov0" title="0">vulcount += len(vulArray)</span>
+                                }
+                        }
+                }
+                <span class="cov0" title="0">break</span>
+        }
+        <span class="cov0" title="0">return vulcount</span>
+}
+func fetchAndPrintJSON(owner, repo, fileName string) int <span class="cov0" title="0">{
+        vulcount := 0
+        url := fmt.Sprintf("https://raw.githubusercontent.com/%s/%s/main/%s", owner, repo, fileName)
+        resp, err := http.Get(url)
+        if err != nil </span><span class="cov0" title="0">{
+                fmt.Println("Error fetching JSON:", err)
+                return 0
+        }</span>
+        <span class="cov0" title="0">defer resp.Body.Close()
+
+        if resp.StatusCode != 200 </span><span class="cov0" title="0">{
+                fmt.Println("Failed to fetch JSON file:", fileName, "Status:", resp.StatusCode)
+                return 0
+        }</span>
+
+        <span class="cov0" title="0">body, err := io.ReadAll(resp.Body)
+        if err != nil </span><span class="cov0" title="0">{
+                fmt.Println("Error reading response body:", err)
+                return 0
+        }</span>
+
+        <span class="cov0" title="0">var jsonData []interface{}
+        if err := json.Unmarshal(body, &amp;jsonData); err != nil </span><span class="cov0" title="0">{
+                fmt.Println("Error parsing JSON:", err)
+                return 0
+        }</span>
+
+        <span class="cov0" title="0">for _, item := range jsonData </span><span class="cov0" title="0">{
+                obj, ok := item.(map[string]interface{})
+                if !ok </span><span class="cov0" title="0">{
+                        fmt.Println("Error: Element is not a JSON object")
+                        continue</span>
+                }
+
+                <span class="cov0" title="0">scanResults, exists := obj["scanResults"].(map[string]interface{})
+                if exists </span>{<span class="cov0" title="0">
+                        //fmt.Println(scanResults)
+                }</span> else<span class="cov0" title="0"> {
+                        fmt.Println("Key 'scanResults' not found")
+                }</span>
+
+                <span class="cov0" title="0">key := "vulnerabilities"
+                if _, found := scanResults["vulnerabilities"]; !found </span><span class="cov0" title="0">{
+                        if _, found := scanResults["findings"]; found </span><span class="cov0" title="0">{
+                                key = "findings"
+                        }</span> else<span class="cov0" title="0"> {
+                                fmt.Println("Neither 'vulnerabilities' nor 'findings' found in", scanResults["scan_id"])
+                                return 0
+                        }</span>
+                }
+                <span class="cov0" title="0">vulResults, exists := scanResults[key]
+                if !exists </span><span class="cov0" title="0">{
+                        fmt.Println("Key 'vulResults' not found")
+                }</span>
+
+                <span class="cov0" title="0">vulArray, ok := vulResults.([]interface{})
+                if !ok </span><span class="cov0" title="0">{
+                        fmt.Println("Error: vulnerabilities is not an array, actual type:", fmt.Sprintf("%T", vulResults))
+                        return 0
+
+                }</span>
+                <span class="cov0" title="0">vulcount = len(vulArray)
+                for _, vulnItem := range vulArray </span><span class="cov0" title="0">{
+                        vulnObj, ok := vulnItem.(map[string]interface{})
+                        if !ok </span><span class="cov0" title="0">{
+                                fmt.Println("Error: vulnerability item is not a JSON object")
+                                continue</span>
+                        }
+
+                        // Print vulnerability details
+                        <span class="cov0" title="0">fmt.Printf("ID: %s\n", vulnObj["id"])
+                        fmt.Printf("Severity: %s\n", vulnObj["severity"])
+                        fmt.Printf("CVSS Score: %v\n", vulnObj["cvss"])
+                        fmt.Printf("Status: %s\n", vulnObj["status"])
+                        fmt.Printf("Package: %s\n", vulnObj["package_name"])
+                        fmt.Printf("Current Version: %s\n", vulnObj["current_version"])
+                        fmt.Printf("Fixed Version: %s\n", vulnObj["fixed_version"])
+                        fmt.Printf("Description: %s\n", vulnObj["description"])
+                        fmt.Printf("Published Date: %s\n", vulnObj["published_date"])
+                        fmt.Printf("Link: %s\n", vulnObj["link"])
+
+                        // Handle risk_factors, which is also an array
+                        if riskFactors, exists := vulnObj["risk_factors"].([]interface{}); exists </span><span class="cov0" title="0">{
+                                fmt.Printf("Risk Factors: %v\n", riskFactors)
+                        }</span>
+                        <span class="cov0" title="0">fmt.Println("-----")</span>
+                }
+        }
+        <span class="cov0" title="0">return vulcount</span>
+}
+func marshalRiskFactors(riskFactors interface{}) string <span class="cov0" title="0">{
+        if rf, ok := riskFactors.([]interface{}); ok </span><span class="cov0" title="0">{
+                riskFactorsJSON, _ := json.Marshal(rf)
+                return string(riskFactorsJSON)
+        }</span>
+        <span class="cov0" title="0">return "[]"</span>
+}
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package main
+
+import (
+        "database/sql"
+        "fmt"
+        "log"
+        "net/http"
+        "vuln-scanner/api"
+        "vuln-scanner/database"
+
+        _ "github.com/mattn/go-sqlite3"
+)
+
+var db *sql.DB
+
+const repoOwner = "velancio"
+const repoName = "vulnerability_scans"
+
+// func initDB() {
+//         var err error
+//         db, err = sql.Open("sqlite3", "./vulnerabilities.db")
+//         if err != nil {
+//                 panic(err)
+//         }
+
+//         _, err = db.Exec(`CREATE TABLE IF NOT EXISTS vulnerabilities (
+//                 id TEXT PRIMARY KEY,
+//                 severity TEXT,
+//                 cvss REAL,
+//                 status TEXT,
+//                 package_name TEXT,
+//                 current_version TEXT,
+//                 fixed_version TEXT,
+//                 description TEXT,
+//                 published_date TEXT,
+//                 link TEXT,
+//                 risk_factors TEXT,
+//                 source_file TEXT,
+//                 scan_time TEXT,
+//                 scan_id TEXT,
+//                 resource_type TEXT,
+//                 resource_name TEXT
+//         )`)
+
+//         if err != nil {
+//                 panic(err)
+//         }
+// }
+
+// func scanHandler(w http.ResponseWriter, r *http.Request) {
+//         totalVulnCount := mainScan()
+//         w.WriteHeader(http.StatusOK)
+//         fmt.Fprintf(w, "Scan completed. Total vulnerabilities: %d", totalVulnCount)
+// }
+// func queryHandler(w http.ResponseWriter, r *http.Request) {
+//         var req struct {
+//                 Filters map[string]string `json:"filters"`
+//         }
+
+//         if err := json.NewDecoder(r.Body).Decode(&amp;req); err != nil {
+//                 http.Error(w, "Invalid request payload", http.StatusBadRequest)
+//                 return
+//         }
+
+//         severity, ok := req.Filters["severity"]
+//         if !ok {
+//                 http.Error(w, "Missing severity filter", http.StatusBadRequest)
+//                 return
+//         }
+
+//         rows, err := db.Query("SELECT id, severity, cvss, status, package_name, current_version, fixed_version, description, published_date, link, risk_factors, source_file, scan_time, scan_id, resource_type, resource_name FROM vulnerabilities WHERE severity = ?", severity)
+//         if err != nil {
+//                 http.Error(w, "Database query error", http.StatusInternalServerError)
+//                 return
+//         }
+//         defer rows.Close()
+//         //fmt.Println(rows)
+//         var results []map[string]interface{}
+//         for rows.Next() {
+//                 var (
+//                         id, severity, status, packageName, currentVersion, fixedVersion, description, publishedDate, link, riskFactors, sourceFile, scanTime, scanId, resourceType, resourceName sql.NullString
+//                         cvss                                                                                                                                                                     sql.NullFloat64
+//                 )
+//                 if err := rows.Scan(&amp;id, &amp;severity, &amp;cvss, &amp;status, &amp;packageName, &amp;currentVersion, &amp;fixedVersion, &amp;description, &amp;publishedDate, &amp;link, &amp;riskFactors, &amp;sourceFile, &amp;scanTime, &amp;scanId, &amp;resourceType, &amp;resourceName); err != nil {
+//                         fmt.Print(err)
+//                         http.Error(w, "Error scanning database results", http.StatusInternalServerError)
+//                         return
+//                 }
+//                 result := map[string]interface{}{
+//                         "id":              nullStringToString(id),
+//                         "severity":        nullStringToString(severity),
+//                         "cvss":            nullFloatToFloat(cvss),
+//                         "status":          nullStringToString(status),
+//                         "package_name":    nullStringToString(packageName),
+//                         "current_version": nullStringToString(currentVersion),
+//                         "fixed_version":   nullStringToString(fixedVersion),
+//                         "description":     nullStringToString(description),
+//                         "published_date":  nullStringToString(publishedDate),
+//                         "link":            nullStringToString(link),
+//                         "risk_factors":    parseRiskFactors(nullStringToString(riskFactors)),
+//                         "source_file":     nullStringToString(sourceFile),
+//                         "scan_time":       nullStringToString(scanTime),
+//                         "scan_id":         nullStringToString(scanId),
+//                         "resource_type":   nullStringToString(resourceType),
+//                         "resource_name":   nullStringToString(resourceName),
+//                 }
+//                 results = append(results, result)
+//         }
+
+//         w.Header().Set("Content-Type", "application/json")
+//         json.NewEncoder(w).Encode(results)
+// }
+
+// func nullStringToString(ns sql.NullString) string {
+//         if ns.Valid {
+//                 return ns.String
+//         }
+//         return "" // Return empty string for null values
+// }
+
+// func nullFloatToFloat(nf sql.NullFloat64) interface{} {
+//         if nf.Valid {
+//                 return nf.Float64
+//         }
+//         return nil // Return nil for null floats
+// }
+
+// func parseRiskFactors(riskFactors string) []string {
+//         var parsed []string
+//         err := json.Unmarshal([]byte(riskFactors), &amp;parsed)
+//         if err != nil {
+//                 // If it's a plain string with spaces, convert it to a slice
+//                 return []string{riskFactors}
+//         }
+//         return parsed
+// }
+
+// func mainScan() int {
+//         totalVulnCount := 0
+//         files, err := getRepoFiles(repoOwner, repoName)
+//         if err != nil {
+//                 fmt.Println("Error fetching repository files:", err)
+//                 return 0
+//         }
+//         var wg sync.WaitGroup
+//         sem := make(chan struct{}, 3)
+//         for _, file := range files {
+//                 if file["type"] == "file" {
+//                         fileName := file["name"].(string)
+//                         if len(fileName) &gt; 5 &amp;&amp; fileName[len(fileName)-5:] == ".json" {
+//                                 wg.Add(1)
+//                                 sem &lt;- struct{}{} // Acquire a slot
+//                                 go func(fileName string) {
+//                                         defer wg.Done()
+//                                         countVul := fetchAndStoreJSON(repoOwner, repoName, fileName)
+//                                         totalVulnCount += countVul
+//                                         &lt;-sem // Release the slot
+//                                 }(fileName)
+//                         }
+//                 }
+//         }
+//         wg.Wait()
+//         return totalVulnCount
+// }
+
+func main() <span class="cov0" title="0">{
+        // initDB()
+        // http.HandleFunc("/scan", scanHandler)
+        // http.HandleFunc("/query", queryHandler)
+
+        // fmt.Println("Server running on port 8081...")
+        // http.ListenAndServe(":8081", nil)
+        db, err := database.InitDB()
+        if err != nil </span><span class="cov0" title="0">{
+                log.Fatalf("Failed to initialize database: %v", err)
+        }</span>
+        <span class="cov0" title="0">defer db.Close()
+
+        // Setup routes
+        router := api.SetupRoutes()
+
+        // Start server
+        fmt.Println("Server running on port 8081...")
+        log.Fatal(http.ListenAndServe(":8081", router))</span>
+}
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">package services
+
+import (
+        "database/sql"
+        "encoding/json"
+        "fmt"
+        "vuln-scanner/database"
+)
+
+func QueryVulnerabilities(severity string) ([]map[string]interface{}, error) <span class="cov8" title="1">{
+        rows, err := database.DB.Query("SELECT id, severity, cvss, status, package_name, current_version, fixed_version, description, published_date, link, risk_factors, source_file, scan_time, scan_id, resource_type, resource_name FROM vulnerabilities WHERE severity = ?", severity)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov8" title="1">defer rows.Close()
+        //fmt.Println(rows)
+        var results []map[string]interface{}
+        for rows.Next() </span><span class="cov8" title="1">{
+                var (
+                        id, severity, status, packageName, currentVersion, fixedVersion, description, publishedDate, link, riskFactors, sourceFile, scanTime, scanId, resourceType, resourceName sql.NullString
+                        cvss                                                                                                                                                                     sql.NullFloat64
+                )
+                if err := rows.Scan(&amp;id, &amp;severity, &amp;cvss, &amp;status, &amp;packageName, &amp;currentVersion, &amp;fixedVersion, &amp;description, &amp;publishedDate, &amp;link, &amp;riskFactors, &amp;sourceFile, &amp;scanTime, &amp;scanId, &amp;resourceType, &amp;resourceName); err != nil </span><span class="cov0" title="0">{
+                        fmt.Print(err)
+                        return nil, err
+                }</span>
+                <span class="cov8" title="1">result := map[string]interface{}{
+                        "id":              nullStringToString(id),
+                        "severity":        nullStringToString(severity),
+                        "cvss":            nullFloatToFloat(cvss),
+                        "status":          nullStringToString(status),
+                        "package_name":    nullStringToString(packageName),
+                        "current_version": nullStringToString(currentVersion),
+                        "fixed_version":   nullStringToString(fixedVersion),
+                        "description":     nullStringToString(description),
+                        "published_date":  nullStringToString(publishedDate),
+                        "link":            nullStringToString(link),
+                        "risk_factors":    parseRiskFactors(nullStringToString(riskFactors)),
+                        "source_file":     nullStringToString(sourceFile),
+                        "scan_time":       nullStringToString(scanTime),
+                        "scan_id":         nullStringToString(scanId),
+                        "resource_type":   nullStringToString(resourceType),
+                        "resource_name":   nullStringToString(resourceName),
+                }
+                results = append(results, result)</span>
+        }
+        <span class="cov8" title="1">return results, nil</span>
+}
+
+func nullStringToString(ns sql.NullString) string <span class="cov8" title="1">{
+        if ns.Valid </span><span class="cov8" title="1">{
+                return ns.String
+        }</span>
+        <span class="cov8" title="1">return ""</span>
+}
+
+func nullFloatToFloat(nf sql.NullFloat64) interface{} <span class="cov8" title="1">{
+        if nf.Valid </span><span class="cov0" title="0">{
+                return nf.Float64
+        }</span>
+        <span class="cov8" title="1">return nil</span> // Return nil for null floats
+}
+
+func parseRiskFactors(riskFactors string) []string <span class="cov8" title="1">{
+        var parsed []string
+        err := json.Unmarshal([]byte(riskFactors), &amp;parsed)
+        if err != nil </span><span class="cov8" title="1">{
+                return []string{riskFactors}
+        }</span>
+        <span class="cov0" title="0">return parsed</span>
+}
+</pre>
+		
+		<pre class="file" id="file7" style="display: none">package services
+
+import (
+        "encoding/json"
+        "fmt"
+        "io"
+        "net/http"
+        "sync"
+        "time"
+        "vuln-scanner/database"
+)
+
+func MainScanner(repoOwner string, repoName string) int <span class="cov0" title="0">{
+        totalVulnCount := 0
+        files, err := GetRepoFiles(repoOwner, repoName)
+        if err != nil </span><span class="cov0" title="0">{
+                fmt.Println("Error fetching repository files:", err)
+                return 0
+        }</span>
+        <span class="cov0" title="0">var wg sync.WaitGroup
+        sem := make(chan struct{}, 3)
+        for _, file := range files </span><span class="cov0" title="0">{
+                if file["type"] == "file" </span><span class="cov0" title="0">{
+                        fileName := file["name"].(string)
+                        if len(fileName) &gt; 5 &amp;&amp; fileName[len(fileName)-5:] == ".json" </span><span class="cov0" title="0">{
+                                wg.Add(1)
+                                sem &lt;- struct{}{} // Acquire a slot
+                                go func(fileName string) </span><span class="cov0" title="0">{
+                                        defer wg.Done()
+                                        fmt.Println("Fetching file:", fileName)
+                                        countVul := FetchAndStoreJSON(repoOwner, repoName, fileName)
+                                        totalVulnCount += countVul
+                                        &lt;-sem // Release the slot
+                                }</span>(fileName)
+                        }
+                }
+        }
+        <span class="cov0" title="0">wg.Wait()
+        return totalVulnCount</span>
+}
+func GetRepoFiles(owner, repo string) ([]map[string]interface{}, error) <span class="cov0" title="0">{
+        url := fmt.Sprintf("https://api.github.com/repos/%s/%s/contents", owner, repo)
+        resp, err := http.Get(url)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">defer resp.Body.Close()
+
+        if resp.StatusCode != 200 </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to fetch files, status code: %d", resp.StatusCode)
+        }</span>
+
+        <span class="cov0" title="0">body, err := io.ReadAll(resp.Body)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">var files []map[string]interface{}
+        err = json.Unmarshal(body, &amp;files)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">return files, nil</span>
+}
+func FetchAndStoreJSON(owner, repo, fileName string) int <span class="cov8" title="1">{
+        vulcount := 0
+        if database.DB == nil </span><span class="cov0" title="0">{
+                fmt.Printf("database is not initialized")
+                return 0
+        }</span>
+        <span class="cov8" title="1">url := fmt.Sprintf("https://raw.githubusercontent.com/%s/%s/main/%s", owner, repo, fileName)
+        for attempt := 0; attempt &lt; 2; attempt++ </span><span class="cov8" title="1">{
+                fmt.Println("Attempt :", attempt, "fetching :", fileName)
+                resp, err := http.Get(url)
+                if err != nil </span><span class="cov0" title="0">{
+                        fmt.Println("Error fetching JSON (Attempt", attempt+1, "):", err)
+                        time.Sleep(2 * time.Second)
+                        continue</span>
+                }
+                <span class="cov8" title="1">defer resp.Body.Close()
+
+                if resp.StatusCode != 200 </span><span class="cov8" title="1">{
+                        fmt.Println("Failed to fetch JSON file:", fileName, "Status:", resp.StatusCode)
+                        time.Sleep(2 * time.Second)
+                        continue</span>
+                }
+
+                <span class="cov0" title="0">body, err := io.ReadAll(resp.Body)
+                if err != nil </span><span class="cov0" title="0">{
+                        fmt.Println("Error reading response body:", err)
+                        return 0
+                }</span>
+
+                <span class="cov0" title="0">var jsonData []interface{}
+                if err := json.Unmarshal(body, &amp;jsonData); err != nil </span><span class="cov0" title="0">{
+                        fmt.Println("Error parsing JSON:", err)
+                        return 0
+                }</span>
+
+                <span class="cov0" title="0">for _, item := range jsonData </span><span class="cov0" title="0">{
+                        obj, ok := item.(map[string]interface{})
+                        if !ok </span><span class="cov0" title="0">{
+                                fmt.Println("Error: Element is not a JSON object")
+                                continue</span>
+                        }
+
+                        <span class="cov0" title="0">scanResults, exists := obj["scanResults"].(map[string]interface{})
+                        if exists </span>{<span class="cov0" title="0">
+                                //fmt.Println(scanResults)
+                        }</span> else<span class="cov0" title="0"> {
+                                fmt.Println("Key 'scanResults' not found")
+                        }</span>
+
+                        <span class="cov0" title="0">scanID, _ := scanResults["scan_id"].(string)
+                        resourceType, _ := scanResults["resource_type"].(string)
+                        resourceName, _ := scanResults["resource_name"].(string)
+                        timestamp, _ := scanResults["timestamp"].(string)
+
+                        for _, key := range []string{"vulnerabilities", "findings"} </span><span class="cov0" title="0">{
+                                if vulResults, found := scanResults[key]; found </span><span class="cov0" title="0">{
+                                        vulArray, ok := vulResults.([]interface{})
+                                        if !ok </span><span class="cov0" title="0">{
+                                                fmt.Println("Error: ", key, " is not an array, actual type:", fmt.Sprintf("%T", vulResults))
+                                                continue</span>
+                                        }
+
+                                        <span class="cov0" title="0">for _, vulnItem := range vulArray </span><span class="cov0" title="0">{
+                                                vulnObj, ok := vulnItem.(map[string]interface{})
+                                                if !ok </span><span class="cov0" title="0">{
+                                                        fmt.Println("Error: vulnerability item is not a JSON object")
+                                                        continue</span>
+                                                }
+
+                                                <span class="cov0" title="0">_, err := database.DB.Exec(`INSERT OR IGNORE INTO vulnerabilities (
+                                                        id, severity, cvss, status, package_name, current_version, fixed_version,
+                                                        description, published_date, link, risk_factors, source_file, scan_time, scan_id, resource_type, resource_name)
+                                                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                                                        vulnObj["id"], vulnObj["severity"], vulnObj["cvss"], vulnObj["status"],
+                                                        vulnObj["package_name"], vulnObj["current_version"], vulnObj["fixed_version"],
+                                                        vulnObj["description"], vulnObj["published_date"], vulnObj["link"],
+                                                        MarshalRiskFactors(vulnObj["risk_factors"]), fileName, timestamp, scanID, resourceType, resourceName)
+                                                if err != nil </span><span class="cov0" title="0">{
+                                                        fmt.Println("DB Insert Error:", err)
+                                                }</span>
+                                                <span class="cov0" title="0">fmt.Println("-----")</span>
+                                        }
+                                        <span class="cov0" title="0">vulcount += len(vulArray)</span>
+                                }
+                        }
+                }
+                <span class="cov0" title="0">break</span>
+        }
+        <span class="cov8" title="1">return vulcount</span>
+}
+
+func MarshalRiskFactors(riskFactors interface{}) string <span class="cov8" title="1">{
+        if rf, ok := riskFactors.([]interface{}); ok </span><span class="cov8" title="1">{
+                riskFactorsJSON, _ := json.Marshal(rf)
+                return string(riskFactorsJSON)
+        }</span>
+        <span class="cov0" title="0">return "[]"</span>
+}
+</pre>
+		
+		<pre class="file" id="file8" style="display: none">package main
+
+import (
+        "encoding/json"
+        "fmt"
+        "io"
+        "net/http"
+)
+
+func fetchJSON(url string) <span class="cov0" title="0">{
+        resp, err := http.Get(url)
+        if err != nil </span><span class="cov0" title="0">{
+                fmt.Println("Error fetching JSON:", err)
+                return
+        }</span>
+        <span class="cov0" title="0">defer resp.Body.Close()
+
+        if resp.StatusCode != http.StatusOK </span><span class="cov0" title="0">{
+                fmt.Println("Failed to fetch JSON, status code:", resp.StatusCode)
+                return
+        }</span>
+
+        <span class="cov0" title="0">body, err := io.ReadAll(resp.Body)
+        if err != nil </span><span class="cov0" title="0">{
+                fmt.Println("Error reading response body:", err)
+                return
+        }</span>
+        <span class="cov0" title="0">var jsonData []interface{}
+        if err := json.Unmarshal(body, &amp;jsonData); err != nil </span><span class="cov0" title="0">{
+                fmt.Println("Error parsing JSON:", err)
+                return
+        }</span>
+
+        <span class="cov0" title="0">for _, item := range jsonData </span><span class="cov0" title="0">{
+                // Assert each item as `map[string]interface{}`
+                obj, ok := item.(map[string]interface{})
+                if !ok </span><span class="cov0" title="0">{
+                        fmt.Println("Error: Element is not a JSON object")
+                        continue</span>
+                }
+
+                // Extract and print "scanResults"
+                <span class="cov0" title="0">scanResults, exists := obj["scanResults"].(map[string]interface{})
+                if exists </span>{<span class="cov0" title="0">
+                        //fmt.Println(scanResults)
+                }</span> else<span class="cov0" title="0"> {
+                        fmt.Println("Key 'scanResults' not found")
+                }</span>
+
+                <span class="cov0" title="0">for key, value := range scanResults </span><span class="cov0" title="0">{
+                        fmt.Println(key, ":", value)
+                }</span>
+                <span class="cov0" title="0">vulResults, exists := scanResults["vulnerabilities"]
+                if exists </span><span class="cov0" title="0">{
+                        fmt.Println("vulResults", vulResults)
+                }</span> else<span class="cov0" title="0"> {
+                        fmt.Println("Key 'vulResults' not found")
+                }</span>
+
+                <span class="cov0" title="0">vulArray, ok := vulResults.([]interface{})
+                if !ok </span><span class="cov0" title="0">{
+                        fmt.Println("Error: vulnerabilities is not an array, actual type:", fmt.Sprintf("%T", vulResults))
+                        return
+
+                }</span>
+
+                // Iterate over vulnerabilities
+                <span class="cov0" title="0">for _, vulnItem := range vulArray </span><span class="cov0" title="0">{
+                        // Assert each vulnerability as a map
+                        vulnObj, ok := vulnItem.(map[string]interface{})
+                        if !ok </span><span class="cov0" title="0">{
+                                fmt.Println("Error: vulnerability item is not a JSON object")
+                                continue</span>
+                        }
+
+                        // Print vulnerability details
+                        <span class="cov0" title="0">fmt.Printf("ID: %s\n", vulnObj["id"])
+                        fmt.Printf("Severity: %s\n", vulnObj["severity"])
+                        fmt.Printf("CVSS Score: %v\n", vulnObj["cvss"])
+                        fmt.Printf("Status: %s\n", vulnObj["status"])
+                        fmt.Printf("Package: %s\n", vulnObj["package_name"])
+                        fmt.Printf("Current Version: %s\n", vulnObj["current_version"])
+                        fmt.Printf("Fixed Version: %s\n", vulnObj["fixed_version"])
+                        fmt.Printf("Description: %s\n", vulnObj["description"])
+                        fmt.Printf("Published Date: %s\n", vulnObj["published_date"])
+                        fmt.Printf("Link: %s\n", vulnObj["link"])
+
+                        // Handle risk_factors, which is also an array
+                        if riskFactors, exists := vulnObj["risk_factors"].([]interface{}); exists </span><span class="cov0" title="0">{
+                                fmt.Printf("Risk Factors: %v\n", riskFactors)
+                        }</span>
+                        <span class="cov0" title="0">fmt.Println("-----")</span>
+                }
+        }
+}
+
+func test() <span class="cov0" title="0">{
+        url := "https://raw.githubusercontent.com/velancio/vulnerability_scans/main/vulnscan1011.json"
+        fetchJSON(url)
+}</span>
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

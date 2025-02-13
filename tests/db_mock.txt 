@@ -1,0 +1,52 @@
+package tests
+
+import (
+	"database/sql"
+	"errors"
+)
+
+// MockDB simulates a database connection
+type MockDB struct {
+	Data map[string][]interface{}
+}
+
+// Exec mocks SQL execution
+func (m *MockDB) Exec(query string, args ...interface{}) (sql.Result, error) {
+	id := args[0].(string)
+	if id == "duplicate" {
+		return nil, errors.New("duplicate entry")
+	}
+	m.Data[id] = args
+	return nil, nil
+}
+
+// QueryRow mocks a single row fetch
+func (m *MockDB) QueryRow(query string, args ...interface{}) *MockRow {
+	id := args[0].(string)
+	if data, exists := m.Data[id]; exists {
+		return &MockRow{Data: data}
+	}
+	return &MockRow{Err: sql.ErrNoRows}
+}
+
+// MockRow simulates a single row result
+type MockRow struct {
+	Data []interface{}
+	Err  error
+}
+
+// Scan simulates scanning SQL row values
+func (r *MockRow) Scan(dest ...interface{}) error {
+	if r.Err != nil {
+		return r.Err
+	}
+	for i := range dest {
+		dest[i] = r.Data[i]
+	}
+	return nil
+}
+
+func MockMarshalRiskFactors() []interface{} {
+
+	return `["Mocked Factor"]`
+}

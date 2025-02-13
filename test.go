@@ -94,7 +94,7 @@ func fetchJSON(url string) {
 	}
 }
 
-func main() {
+func test() {
 	url := "https://raw.githubusercontent.com/velancio/vulnerability_scans/main/vulnscan1011.json"
 	fetchJSON(url)
 }
