@@ -1,6 +1,6 @@
 # Vulnerability Scanner API
 
-This Go service scans a **GitHub repository** for JSON vulnerability reports, **stores them in an SQLite database**, and provides a **query API** to retrieve vulnerabilities based on severity.
+This Go service scans a **velancio/vulnerability_scans/** repo for JSON CVE reports, **stores them in an SQLite database**, and provides a **query API** to retrieve vulnerabilities based on severity.
 
 ---
 
@@ -217,8 +217,8 @@ Retrieves vulnerabilities matching the given severity.
 
     vuln-scanner
     ├── api
-    │   ├── scan_handler.go         # Handles /scan API
-    │   ├── query_handler.go        # Handles /query API
+    │   ├── scan.go         # Handles /scan API
+    │   ├── query.go        # Handles /query API
     │   └── route.go                # Defines routes
     ├── database
     │   ├── database.go             # SQLite setup & queries
@@ -263,6 +263,13 @@ To load environment variables, run:
 ## License
 
 MIT License
+
+---
+
+📌 Author
+Soubhagya
+📧 soubhagyancsu@gmail.com
+🌐 https://www.linkedin.com/in/soubhgya-akkena
 
 ---
 
