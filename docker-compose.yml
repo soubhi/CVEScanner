@@ -1,0 +1,7 @@
+version: '3.8'
+services:
+  scanner:
+    build: .
+    ports:
+      - "8081:8081"
+    restart: always
