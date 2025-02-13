@@ -265,11 +265,11 @@ To load environment variables, run:
 MIT License
 
 ---
-
-📌 Author
-Soubhagya
-📧 soubhagyancsu@gmail.com
-🌐 https://www.linkedin.com/in/soubhgya-akkena
+<a name="author"></a>
+📌 ## Author
+Soubhagya Akkena <br>
+📧 soubhagyancsu@gmail.com <br>
+🌐 https://www.linkedin.com/in/soubhgya-akkena <br>
 
 ---
 
