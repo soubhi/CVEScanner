@@ -19,7 +19,7 @@ This Go service scans a **velancio/vulnerability_scans/** repo for JSON CVE repo
 9. [Environment Variables](#environment-variables)  
 10. [Contributing](#contributing)  
 11. [License](#license) 
-12. [Authoe] (#author) 
+12. [Authoe](#author) 
 
 ---
 
