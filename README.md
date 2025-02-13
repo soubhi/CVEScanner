@@ -266,7 +266,7 @@ MIT License
 
 ---
 <a name="author"></a>
-📌 ## Author
+## 📌 Author
 Soubhagya Akkena <br>
 📧 soubhagyancsu@gmail.com <br>
 🌐 https://www.linkedin.com/in/soubhgya-akkena <br>
